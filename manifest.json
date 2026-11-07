@@ -1,1 +1,1 @@
-{"name": "XAUUSD Advanced Scanner", "short_name": "XAU Scanner", "start_url": "./", "display": "standalone", "background_color": "#08111f", "theme_color": "#08111f", "lang": "ar", "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}]}
+{"name": "XAUUSD Advanced Scanner", "short_name": "XAU Scanner", "start_url": "./", "display": "standalone", "background_color": "#000000", "theme_color": "#000000", "lang": "ar", "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}]}
