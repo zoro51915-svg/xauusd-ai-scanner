@@ -68,10 +68,49 @@ button{background:#17475b;border-color:#28576c}button.active{background:#17647a}
 .meter i{display:block;height:100%;background:#48c5dc}
 .tag{font-size:10px;border:1px solid #35516a;border-radius:20px;padding:3px 7px;color:#b7cbdc}
 @media(max-width:520px){.intel-grid{grid-template-columns:1fr}.module-chart{height:125px}}
-</style></head><body><header><div class="top"><div><div class="brand">◈ XAUUSD <span class="gold">ADVANCED SCANNER</span></div><div class="muted">تحليل احتمالي — لا ينفذ صفقات</div></div><b id="status" class="muted">غير متصل</b></div></header><main><div class="grid">
+
+/* Trading terminal redesign v1 */
+:root{--bg:#131722;--p:#1e222d;--l:#2a2e39;--t:#d1d4dc;--m:#787b86;--g:#089981;--r:#f23645;--y:#f0b90b;--b:#2962ff}
+html,body{background:var(--bg)!important;color:var(--t)!important;font-family:Arial,system-ui,sans-serif}
+header{background:#131722!important;border-bottom:1px solid #2a2e39!important;padding:9px 14px!important}
+.brand{font-size:16px;letter-spacing:.2px}.brand .gold{color:#f0b90b}
+main{max-width:1600px!important;padding:8px!important}
+.grid{display:block!important}
+.grid>section{display:none!important}
+.grid>section:nth-of-type(1),.grid>section:nth-of-type(6){display:block!important}
+.grid>section:nth-of-type(1){background:#1e222d!important;border:1px solid #2a2e39!important;border-radius:5px!important;margin-bottom:8px;padding:8px!important}
+.grid>section:nth-of-type(1) .head{display:none}
+.grid>section:nth-of-type(1) .note{display:none}
+.grid>section:nth-of-type(1) .row{max-width:520px}
+.grid>section:nth-of-type(6){background:#131722!important;border:1px solid #2a2e39!important;border-radius:5px!important;padding:8px!important}
+.grid>section:nth-of-type(6)>.head{font-size:14px;color:#d1d4dc;border-bottom:1px solid #2a2e39;padding:4px 0 10px}
+#chart{height: min(66vh,720px)!important;min-height:390px;background:#131722}
+.chart-wrap{background:#131722!important;touch-action:pan-y}
+.tabs{gap:3px;margin:7px 0!important;align-items:center}
+.tabs button,.drawbar button{background:transparent!important;border:1px solid transparent!important;border-radius:4px!important;color:#b2b5be!important;padding:6px 9px!important;font-size:12px!important}
+.tabs button:hover,.drawbar button:hover{background:#2a2e39!important}
+.tabs button.active,.drawbar button.active{background:#2962ff22!important;border-color:#2962ff!important;color:#fff!important}
+.drawbar{background:#1e222d!important;border:1px solid #2a2e39!important;border-radius:5px!important;padding:6px!important}
+.toolrow{gap:3px}
+.toolrow input,.toolrow select{background:#131722!important;border:1px solid #363a45!important;color:#d1d4dc!important}
+#drawApply,#drawDelete,#drawUndo,#drawClear,#drawExit{border-color:#363a45!important}
+.watermark{display:none!important}
+.card{box-shadow:none!important}
+@media(max-width:650px){
+ main{padding:4px!important}
+ #chart{height:58vh!important;min-height:340px}
+ .grid>section:nth-of-type(1) .row{gap:5px}
+ .grid>section:nth-of-type(1) input{font-size:12px}
+ .tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+ .tabs button{white-space:nowrap;flex:none}
+ .drawbar{overflow-x:auto;flex-wrap:nowrap}
+ .toolrow{flex-wrap:nowrap;width:max-content}
+ .drawbar button{white-space:nowrap;flex:none}
+}
+</style></head><body><header><div class="top"><div><div class="brand">◈ <span class="gold">MARKET CHART</span></div><div class="muted">واجهة رسوم بيانية</div></div><b id="status" class="muted">غير متصل</b></div></header><main><div class="grid">
 <section class="card wide"><div class="head">الاتصال والبيانات</div><div class="row"><input id="key" type="password" placeholder="Twelve Data API Key"><button id="connect">اتصال وتحديث</button><button id="refresh">تحديث</button></div><div class="note">المفتاح يحفظ محلياً في المتصفح. لا تشاركه. قد تحد خطة مزود البيانات عدد الطلبات والفريمات.</div></section>
 <section class="card"><div class="muted">السعر</div><div class="big gold" id="price">—</div><div class="muted" id="priceMeta">بانتظار البيانات</div></section><section class="card"><div class="muted">نظام السوق</div><div class="big" id="regime">—</div></section><section class="card"><div class="muted">الاتجاه</div><div class="big" id="trend">—</div><div class="muted" id="trendMeta">توافق الفريمات</div></section><section class="card"><div class="muted">قوة السيناريو</div><div class="big" id="strength">—</div><div class="bar"><i id="bar"></i></div></section>
-<section class="card wide"><div class="head">الشارت والتحكم اليدوي</div><div class="row" style="margin-bottom:8px"><label class="muted">السوق<select id="market"><option value="XAU/USD">الذهب XAUUSD</option><option value="BTC/USD">البيتكوين BTCUSD</option></select></label></div><div class="tabs" id="tabs"><button data-tf="1min" class="active">1m</button><button data-tf="5min">5m</button><button data-tf="15min">15m</button><button data-tf="1h">1H</button><button data-tf="4h">4H</button><button data-tf="1day">1D</button><button id="now">السعر الحالي</button><button id="full">ملء الشاشة</button></div><div class="chart-wrap" id="chartWrap"><div class="drawbar" id="drawbar"><div class="toolrow"><button data-draw="select">تحديد</button><button data-draw="trend">خط الاتجاه</button><button data-draw="ray">شعاع</button><button data-draw="hray">شعاع أفقي</button><button data-draw="hline">خط أفقي</button><button data-draw="rect">مستطيل</button><button data-draw="path">مسار</button><button data-draw="arrow">سهم</button><button data-draw="text">نص</button><button data-draw="channel">قناة متوازية</button><button data-draw="fib">فيبوناتشي</button></div><div class="toolrow"><input id="drawName" placeholder="اسم الرسم" style="width:105px"><input id="drawColor" type="color" value="#f0c76a" title="لون الرسم" style="width:42px;padding:3px"><select id="drawWidth" style="width:62px"><option value="1">1px</option><option value="2" selected>2px</option><option value="3">3px</option><option value="4">4px</option></select><select id="drawStyle" style="width:95px"><option value="solid">متصل</option><option value="dashed">متقطع</option><option value="dotted">منقّط</option></select><button id="drawApply">تطبيق على المحدد</button><button id="drawDelete">حذف المحدد</button><button id="drawUndo">تراجع</button><button id="drawClear">مسح الكل</button><button id="drawExit">إلغاء</button><span class="muted">التحديد ثم السحب لتحريك الرسم</span></div></div><div id="chart"></div><svg id="drawLayer" aria-label="طبقة الرسم"></svg><div class="watermark">amieislam</div></div><div class="note">تحديث تلقائي كل 10 ثوانٍ أثناء بقاء الصفحة مفتوحة · قد ينفد رصيد API اليومي · <span id="lastUpdate">لم يتم التحديث بعد</span><br>يمكن سحب الشارت وتكبيره. اختر الفريم الرئيسي يدوياً من الأزرار.</div></section>
+<section class="card wide"><div class="head">الرسم البياني</div><div class="row" style="margin-bottom:8px"><label class="muted">السوق<select id="market"><option value="XAU/USD">الذهب XAUUSD</option><option value="BTC/USD">البيتكوين BTCUSD</option></select></label></div><div class="tabs" id="tabs"><button data-tf="1min" class="active">1m</button><button data-tf="5min">5m</button><button data-tf="15min">15m</button><button data-tf="1h">1H</button><button data-tf="4h">4H</button><button data-tf="1day">1D</button><button id="now">السعر الحالي</button><button id="full">ملء الشاشة</button></div><div class="chart-wrap" id="chartWrap"><div class="drawbar" id="drawbar"><div class="toolrow"><button data-draw="select">تحديد</button><button data-draw="trend">خط الاتجاه</button><button data-draw="ray">شعاع</button><button data-draw="hray">شعاع أفقي</button><button data-draw="hline">خط أفقي</button><button data-draw="rect">مستطيل</button><button data-draw="path">مسار</button><button data-draw="arrow">سهم</button><button data-draw="text">نص</button><button data-draw="channel">قناة متوازية</button><button data-draw="fib">فيبوناتشي</button></div><div class="toolrow"><input id="drawName" placeholder="اسم الرسم" style="width:105px"><input id="drawColor" type="color" value="#f0c76a" title="لون الرسم" style="width:42px;padding:3px"><select id="drawWidth" style="width:62px"><option value="1">1px</option><option value="2" selected>2px</option><option value="3">3px</option><option value="4">4px</option></select><select id="drawStyle" style="width:95px"><option value="solid">متصل</option><option value="dashed">متقطع</option><option value="dotted">منقّط</option></select><button id="drawApply">تطبيق على المحدد</button><button id="drawDelete">حذف المحدد</button><button id="drawUndo">تراجع</button><button id="drawClear">مسح الكل</button><button id="drawExit">إلغاء</button><span class="muted">التحديد ثم السحب لتحريك الرسم</span></div></div><div id="chart"></div><svg id="drawLayer" aria-label="طبقة الرسم"></svg><div class="watermark">amieislam</div></div><div class="note">تحديث تلقائي كل 10 ثوانٍ أثناء بقاء الصفحة مفتوحة · قد ينفد رصيد API اليومي · <span id="lastUpdate">لم يتم التحديث بعد</span><br>يمكن سحب الشارت وتكبيره. اختر الفريم الرئيسي يدوياً من الأزرار.</div></section>
 <section class="card span2"><div class="head">السيناريوهات المتنافسة</div><div id="best" class="signal">بانتظار البيانات</div><div class="kpis"><div class="kpi">صاعد<b class="green" id="bull">—</b></div><div class="kpi">هابط<b class="red" id="bear">—</b></div><div class="kpi">القرار<b id="decision">—</b></div></div><div class="note" id="why">الدرجات أوزان قواعد وليست احتمالات نجاح معايرة.</div></section>
 <section class="card span2"><div class="head">الانعكاس المبكر</div><div class="signal" id="reversal">لا توجد قراءة</div><div class="note" id="revWhy">يراقب الرفض والسحب والانضغاط وضعف المتابعة.</div></section>
 <section class="card wide"><div class="head">خطة المراقبة الافتراضية</div><div class="kpis"><div class="kpi">الدخول<b id="entry">—</b></div><div class="kpi">وقف الإلغاء<b id="stop">—</b></div><div class="kpi">R:R<b id="rr">—</b></div></div><table><thead><tr><th>الهدف</th><th>السعر</th><th>النسبة</th></tr></thead><tbody id="targets"><tr><td colspan="3">لا توجد خطة مؤكدة</td></tr></tbody></table><div class="note">مستويات حسابية تعليمية وليست توصية أو ضمان ربح.</div></section>
