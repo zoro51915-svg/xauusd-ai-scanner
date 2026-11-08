@@ -39,11 +39,11 @@ function makeAvwap(bars){
 function renderIndicatorPanels(){
  const f=$('panelTf')?.value||tf,bars=data[f]||[];
  if(!bars.length){$('tpoPanel').textContent='لا توجد بيانات لهذا الإطار.';$('liqPanel').textContent='لا توجد بيانات.';return}
- const values=bars.slice(-100),lo=Math.min(...values.map(x=>x.low)),hi=Math.max(...values.map(x=>x.high)),step=(hi-lo)/8||1,bins=Array(8).fill(0);
- values.forEach(x=>{let i=Math.max(0,Math.min(7,Math.floor((x.close-lo)/step)));bins[i]++});
- const max=Math.max(...bins);
- $('tpoPanel').innerHTML=bins.map((n,i)=>'<div class="row" style="gap:8px;margin:4px 0"><span class="muted" style="width:90px">'+fmtPrice(lo+step*(i+.5))+'</span><div class="meter" style="flex:1"><i style="width:'+(n/max*100)+'%"></i></div><span class="muted">'+n+'</span></div>').join('');
- $('liqPanel').innerHTML=bins.map((n,i)=>'<div class="row" style="gap:8px;margin:4px 0"><span class="muted" style="width:90px">'+fmtPrice(lo+step*(i+.5))+'</span><div class="meter" style="flex:1"><i style="width:'+(n/max*100)+'%;background:'+(n>=max*.75?'#e8bd62':'#48c5dc')+'"></i></div><span class="muted">'+(n>=max*.75?'كثافة أعلى':'كثافة أقل')+'</span></div>').join('');
+ const values=bars.slice(-100),lo=Math.min(...values.map(x=>x.low)),hi=Math.max(...values.map(x=>x.high)),step=(hi-lo)/8||1,tpo=Array(8).fill(0),activity=Array(8).fill(0);
+ values.forEach(x=>{const first=Math.max(0,Math.min(7,Math.floor((x.low-lo)/step))),last=Math.max(0,Math.min(7,Math.floor((x.high-lo)/step)));for(let i=first;i<=last;i++){tpo[i]++;const vol=Number(x.volume)>0?Number(x.volume):1;activity[i]+=vol/(last-first+1)}});
+ const maxT=Math.max(...tpo,1),maxA=Math.max(...activity,1);
+ $('tpoPanel').innerHTML=tpo.map((n,i)=>'<div class="row" style="gap:8px;margin:4px 0"><span class="muted" style="width:90px">'+fmtPrice(lo+step*(i+.5))+'</span><div class="meter" style="flex:1"><i style="width:'+(n/maxT*100)+'%"></i></div><span class="muted">'+n+' شمعة</span></div>').join('')+'<div class="note">POC التقريبي: '+fmtPrice(lo+step*(tpo.indexOf(maxT)+.5))+' · VAH/VAL غير محسوبين بعد.</div>';
+ $('liqPanel').innerHTML=activity.map((n,i)=>'<div class="row" style="gap:8px;margin:4px 0"><span class="muted" style="width:90px">'+fmtPrice(lo+step*(i+.5))+'</span><div class="meter" style="flex:1"><i style="width:'+(n/maxA*100)+'%;background:'+(n>=maxA*.75?'#e8bd62':'#48c5dc')+'"></i></div><span class="muted">'+(n>=maxA*.75?'نشاط أعلى':'نشاط أقل')+'</span></div>').join('');
  const av=makeAvwap(values);
  try{
   if(!avwapChart){avwapChart=LightweightCharts.createChart($('avwapChart'),{layout:{background:{color:'#0b1420'},textColor:'#9aadc2'},grid:{vertLines:{color:'#1b2b3b'},horzLines:{color:'#1b2b3b'}},timeScale:{timeVisible:true,borderColor:'#263b50'},rightPriceScale:{borderColor:'#263b50'},height:150});avwapSeries=avwapChart.addLineSeries({color:'#48c5dc',lineWidth:2,priceLineVisible:false});}
@@ -109,9 +109,9 @@ button{background:#17475b;border-color:#28576c}button.active{background:#17647a}
 <section class="card wide" id="advancedIndicators">
  <div class="head">لوحات المؤشرات المستقلة</div>
  <div class="row"><label class="muted">إطار اللوحات<select id="panelTf"><option value="15min">15 دقيقة</option><option value="1h">ساعة</option><option value="4h">4 ساعات</option><option value="1day">يومي</option><option value="5min">5 دقائق</option><option value="1min">دقيقة</option></select></label><button id="refreshPanels">تحديث اللوحات</button></div>
- <div class="card" style="margin-top:9px"><div class="head">Anchored VWAP — متوسط السعر المرجح بالحجم من بداية البيانات المحملة</div><div id="avwapChart" class="module-chart"></div><div class="note">إذا لم يوفر المصدر حجماً صالحاً، يستخدم المحرك متوسطاً تقريبياً معلناً؛ اختر نقطة الارتكاز لاحقاً عند تطوير أداة التحديد.</div></div>
+ <div class="card" style="margin-top:9px"><div class="head">VWAP تقريبي من بداية البيانات المحملة — الارتكاز اليدوي قيد التطوير</div><div id="avwapChart" class="module-chart"></div><div class="note">يعرض VWAP مرجحاً بالحجم عند توفره؛ وإلا يعرض متوسطاً تراكمياً متساوي الأوزان. هذا ليس Anchored VWAP قابلاً لاختيار نقطة ارتكاز بعد.</div></div>
  <div class="card" style="margin-top:9px"><div class="head">TPO / Market Profile — توزيع زمني تقريبي</div><div id="tpoPanel"></div><div class="note">تقسيم سعري مبني على وجود الشموع في النطاقات، وليس بيانات تدفق أوامر حقيقية.</div></div>
- <div class="card" style="margin-top:9px"><div class="head">خريطة السيولة — تقدير من كثافة التداول السعري</div><div id="liqPanel"></div><div class="note">خريطة تقديرية من OHLC/الحجم المتاح. دفتر الأوامر والسيولة المعلقة الحقيقية يتطلبان مزود بيانات Level 2 مستقل.</div></div>
+ <div class="card" style="margin-top:9px"><div class="head">خريطة كثافة السعر — تقدير من نطاقات الشموع</div><div id="liqPanel"></div><div class="note">تقدير لتكرار مرور الشموع بنطاقات السعر من OHLC. لا يمثل أوامر معلقة أو سيولة دفتر الأوامر.</div></div>
 </section>
 </div><div class="footer">لا ينفذ صفقات. قد تتأخر البيانات أو تنقطع. اختبر على حساب تجريبي ولا تعتمد على إشارة منفردة في قرارات مالية.</div></main>
 <script>
